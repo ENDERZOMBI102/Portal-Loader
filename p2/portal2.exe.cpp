@@ -7,7 +7,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <windows.h>
+#include <Windows.h>
 
 // ------------------------ Structures ------------------------
 
@@ -158,10 +158,10 @@ int function_409559(void);
 int g1 = 0; // eax
 int g2 = 0; // ebp
 int g3 = 0; // ebx
-int g4 = 0; // ecx
+int baseAddress = 0; // ecx
 int g5 = 0; // edi
 int g6 = 0; // esi
-char * g7 = "l";
+char * g7 = 'l';
 int g8 = 0x6000006;
 char (*g9)[7] = "(null)";
 int16_t (*g10)[7] = L"(null)";
@@ -191,7 +191,8 @@ int * g16 = &g26;
 // Address range: 0x401000 - 0x40108b
 int function_401000(int a1) {
     unsigned char v1 = *(char *)g1; // 0x40101122
-    int v2 = (int)v1 | g4 & -256; // 0x40101125
+    // v2 is an OR of the bits of the two variables
+    int v2 = (int)v1 | baseAddress & -256; // 0x40101125
     int v3; // bp-264
     *(char *)&v3 = v1;
     int v4 = g1 + 1; // 0x40101628
@@ -207,6 +208,7 @@ int function_401000(int a1) {
             *(char *)(v4 + (int)&v3 - g1) = v5;
         }
     }
+    //This strrchr function Returns a pointer to the last occurrence of a character in a string, in this case, searches for "\"
     char * v6 = _strrchr((char *)&v3, 92); // 0x401024
     if (v6 != NULL) {
         // 0x401030
@@ -254,35 +256,54 @@ int function_401000(int a1) {
 // Address range: 0x401090 - 0x4011e6
 int winMain(int hModule, int a2, int a3, int a4) {
     // 0x401090
-    __chkstk();//is a helper routine that is called when local variables exceed 4K bytes
-    g4 = hModule;//this is the base andress of the module in memory
+    //is a helper routine that is called when local variables exceed 4K bytes
+    __chkstk();
+    //this is the base andress of the module in memory
+    baseAddress = hModule;
+    //get the enviromental variable path..?
     int v1 = (int)_getenv("PATH"); // edi
     int lpFilename; // bp-264
+    //get the size of the module file name
     int nameSize = GetModuleFileNameA((int *)hModule, (char *)&lpFilename, 260); // 0x4010bd
-    if (nameSize == 0) { //exit because it cant load a module
+    //check if the nameSize is not 0, if yes exit because it cant load a module
+    if (nameSize == 0) {
         // 0x4010c7
+        // display the message box
         MessageBoxA((int *)nameSize, "Failed calling GetModuleFileName", "Launcher Error", nameSize);
+        //close the program
         return 0;
     }
     // 0x4010e2
+    //get lpFileName address
     g1 = &lpFilename;
     int v2; // esi
-    int v3 = function_401000(v2); // 0x4010e9
+    int v3 = function_401000(v2); // 0x4010e9 tf is this function??
     int v4; // bp-5384
-    __snprintf((char *)&v4, 0x1000, "PATH=%s\\bin\\;%s", (char *)v3, (char *)v1);//put "PATH=%s\\bin\\;%s" to v4 (array)
-    __putenv(NULL);//put NULL into the env. variables
-    __snprintf((char *)&v4, 0x1000, "%s\\bin\\launcher.dll", (char *)v3);//put "%s\\bin\\launcher.dll" to v4 (array)
+    //put "PATH=%s\\bin\\;%s" to v4 (array)
+    __snprintf((char *)&v4, 0x1000, "PATH=%s\\bin\\;%s", (char *)v3, (char *)v1);
+    //put NULL into the env. variables
+    __putenv(NULL);
+    //put "%s\\bin\\launcher.dll" to v4 (array)
+    __snprintf((char *)&v4, 0x1000, "%s\\bin\\launcher.dll", (char *)v3);
+    //load the library into hModule2 (why int?)
     int * hModule2 = LoadLibraryExA(NULL, &g30, (int)&g30); // 0x401147
+    //check if hModule2 exist (aka is loaded), if yes starts it
     if (hModule2 != NULL) {
         // 0x4011be
-        return (int)GetProcAddress(hModule2, "LauncherMain");//return the process andress of LauncherMain function
+        //return the process andress of LauncherMain function (start the function)
+        return (int)GetProcAddress(hModule2, "LauncherMain");
     }
+    //get the last error code (ex 2)
     int errorCode = GetLastError(); // 0x40115d
     FormatMessageA(0x1300, NULL, errorCode, (int)&g30, (char *)&g30, (int)&g30, &g30);
     int v5; // bp-1288
+    //put the text into the array
     __snprintf((char *)&v5, 1024, "Failed to load the launcher DLL:\n\n%s", (char *)hModule);
+    //display an error message
     MessageBoxA(NULL, (char *)&g30, (char *)&g30, (int)&g30);
+    //free the hModule (this) function
     LocalFree((int *)hModule);
+    //close all
     return 0;
 }
 
@@ -948,7 +969,7 @@ int __output_l(int a1, int a2, int a3, int a4) {
     int v133; // 0x403768
     if (v75 == 0) {
         int v134 = v72; // 0x40365e
-        g4 = v134;
+        baseAddress = v134;
         int v135;
         if ((v72 & 64) != 0) {
             if ((v134 & 256) == 0) {
@@ -980,7 +1001,7 @@ int __output_l(int a1, int a2, int a3, int a4) {
                 int v138 = v137; // 0x4036cd543
                 while (true) {
                     // 0x4036bf
-                    g4 = a1;
+                    baseAddress = a1;
                     g6 = v131;
                     a4 = v138 - 1;
                     _write_char();
@@ -1004,7 +1025,7 @@ int __output_l(int a1, int a2, int a3, int a4) {
         *(int *)(v1 - 8) = v132;
         g1 = v131;
         function_402c36((int)&g30, (int)&g30);
-        g4 = *(int *)(v1 + 4);
+        baseAddress = *(int *)(v1 + 4);
         if ((v72 & 8) != 0) {
             if ((v72 & 4) == 0) {
                 // 0x403718
@@ -1012,7 +1033,7 @@ int __output_l(int a1, int a2, int a3, int a4) {
                     while (true) {
                         // 0x403720
                         g6 = v131;
-                        g4 = g3;
+                        baseAddress = g3;
                         a4 = v137 - 1;
                         _write_char();
                         if (v25 == -1) {
@@ -1067,7 +1088,7 @@ int __output_l(int a1, int a2, int a3, int a4) {
                 *(int *)(v1 + 8) = v133;
                 g1 = v131;
                 function_402c36((int)&g30, (int)&g30);
-                g4 = *(int *)(v1 + 4);
+                baseAddress = *(int *)(v1 + 4);
                 if (v144 == 0) {
                     goto lab_0x4037db;
                 }
@@ -2095,7 +2116,7 @@ int __output_l(int a1, int a2, int a3, int a4) {
   lab_0x403870:
     // 0x403870
     g1 = v17;
-    g4 = g2 ^ g15 ^ v3;
+    baseAddress = g2 ^ g15 ^ v3;
     return _40___security_check_cookie_40_4();
 }
 
@@ -2283,7 +2304,7 @@ int __crt_debugger_hook(void) {
 // Address range: 0x406146 - 0x406155
 int _40___security_check_cookie_40_4(void) {
     // 0x406146
-    if (g4 != g15) {
+    if (baseAddress != g15) {
         // 0x406150
         return ___report_gsfailure();
     }
