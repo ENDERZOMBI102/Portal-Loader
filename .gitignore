@@ -1,11 +1,3 @@
-
-p2/Nuova cartella/matchmaking.dll
-p2/Nuova cartella/matchmaking.dll.bc
-p2/Nuova cartella/matchmaking.dll.c
-p2/Nuova cartella/matchmaking.dll.dsm
-p2/Nuova cartella/matchmaking.dll.ll
-p2/Nuova cartella/matchmaking.dll.json
-p2/xjan/client.so
-p2/xjan/server.dll
-p2/xjan/client.dll
-p2/xjan/server.so
+p2/portal2/debug/*
+p2/portal2/debug/
+p2/portal2/*.aps
