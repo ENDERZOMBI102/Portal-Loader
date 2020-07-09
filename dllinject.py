@@ -2,7 +2,6 @@ from win32com.client import GetObject
 from webbrowser import open as webopen
 from ctypes import *
 from os import stat
-from time import sleep
 WMI = GetObject('winmgmts:')
 
 print("starting portal 2...")
