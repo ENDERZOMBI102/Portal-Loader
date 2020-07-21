@@ -4,14 +4,9 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
-pylint = "*"
-autopep8 = "*"
 
 [packages]
-cython = "*"
-pillow = "*"
-190b7c5 = {file = "https://github.com/ENDERZOMBI102/BEE-manipulator/raw/Old-master/srctools-1.2.0-py3.7.egg"}
-pywin32 = "*"
+frida-tools = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.8"
